@@ -126,6 +126,19 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Upgrade CTA */}
+        {profile.subscription_tier === "free" && (
+          <div className="mb-8 border border-indigo-500/30 rounded-xl p-6 bg-indigo-500/10 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold mb-1">Upgrade your plan</h2>
+              <p className="text-gray-400 text-sm">Get more uses and access to all tools.</p>
+            </div>
+            <Link href="/pricing" className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg font-semibold transition shrink-0">
+              View Plans →
+            </Link>
+          </div>
+        )}
+
         {/* Quick Info */}
         <div className="border border-white/10 rounded-xl p-6 bg-white/5">
           <h2 className="text-lg font-bold mb-4">Account Info</h2>

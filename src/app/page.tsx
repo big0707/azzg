@@ -16,7 +16,13 @@ export default function Home() {
         <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
           AZZG
         </h1>
-        <div className="flex gap-4">
+        <div className="flex gap-4 items-center">
+          <Link href="/tools" className="px-4 py-2 text-sm text-gray-300 hover:text-white transition">
+            Tools
+          </Link>
+          <Link href="/pricing" className="px-4 py-2 text-sm text-gray-300 hover:text-white transition">
+            Pricing
+          </Link>
           <Link href="/auth/login" className="px-4 py-2 text-sm text-gray-300 hover:text-white transition">
             Sign In
           </Link>
@@ -66,7 +72,7 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section className="px-6 py-16 max-w-4xl mx-auto">
+      <section className="px-6 py-16 max-w-4xl mx-auto" id="pricing">
         <h3 className="text-2xl font-bold mb-8 text-center">Pricing</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="border border-white/10 rounded-xl p-6 bg-white/5">
