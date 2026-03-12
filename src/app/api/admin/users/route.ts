@@ -11,38 +11,18 @@ function createServiceClient() {
 }
 
 async function verifyAdmin(request: NextRequest) {
-  // Get the user's token from the cookie or authorization header
   const authHeader = request.headers.get("authorization");
-  const token = authHeader?.replace("Bearer ", "") || "";
-  
-  // Use anon client to verify the user
+  if (!authHeader) return null;
+
+  const token = authHeader.replace("Bearer ", "");
   const anonClient = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
-  
-  // Try to get user from cookie-based session
-  const cookieHeader = request.headers.get("cookie") || "";
-  const sbAccessToken = cookieHeader.match(/sb-[^=]+-auth-token=([^;]+)/)?.[1];
-  
-  if (sbAccessToken) {
-    try {
-      const decoded = JSON.parse(decodeURIComponent(sbAccessToken));
-      const accessToken = decoded?.[0] || decoded;
-      if (typeof accessToken === "string") {
-        const { data: { user } } = await anonClient.auth.getUser(accessToken);
-        if (user && ADMIN_EMAILS.includes(user.email || "")) return user;
-      }
-    } catch {}
-  }
-  
-  // Fallback: try authorization header
-  if (token) {
-    const { data: { user } } = await anonClient.auth.getUser(token);
-    if (user && ADMIN_EMAILS.includes(user.email || "")) return user;
-  }
-  
-  return null;
+  const { data: { user }, error } = await anonClient.auth.getUser(token);
+  if (error || !user) return null;
+  if (!ADMIN_EMAILS.includes(user.email || "")) return null;
+  return user;
 }
 
 // GET - List all users
@@ -65,7 +45,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ users });
 }
 
-// PATCH - Update user (enable/disable, change tier, etc.)
+// PATCH - Update user
 export async function PATCH(request: NextRequest) {
   const admin = await verifyAdmin(request);
   if (!admin) {
@@ -79,7 +59,6 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "userId required" }, { status: 400 });
   }
 
-  // Add metadata for enable/disable
   if ("is_enabled" in updates) {
     if (updates.is_enabled) {
       updates.enabled_at = new Date().toISOString();

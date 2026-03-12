@@ -5,22 +5,27 @@ import type { UserProfile } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+const ADMIN_EMAILS = ["big0707@gmail.com"];
+
 export default function Dashboard() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
   const supabase = createBrowserClient();
   const router = useRouter();
 
   useEffect(() => {
     async function load() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push("/auth/login"); return; }
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { router.push("/auth/login"); return; }
+      
+      const user = session.user;
       setUserEmail(user.email || "");
+      setIsAdmin(ADMIN_EMAILS.includes(user.email || ""));
       
       const { data, error } = await supabase.from("profiles").select("*").eq("id", user.id).single();
       if (error || !data) {
-        // Profile table might not exist yet or no profile row — show basic dashboard
         setProfile(null);
         setLoading(false);
         return;
@@ -40,7 +45,6 @@ export default function Dashboard() {
     </main>
   );
 
-  // Fallback dashboard when profile table doesn't exist yet
   if (!profile) {
     return (
       <main className="min-h-screen p-6">
@@ -48,6 +52,11 @@ export default function Dashboard() {
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-2xl font-bold">Dashboard</h1>
             <div className="flex gap-3">
+              {isAdmin && (
+                <Link href="/admin" className="px-4 py-2 bg-red-600/80 rounded-lg text-sm hover:bg-red-500 transition">
+                  Admin
+                </Link>
+              )}
               <Link href="/tools" className="px-4 py-2 bg-indigo-600 rounded-lg text-sm hover:bg-indigo-500 transition">
                 Browse Tools
               </Link>
@@ -64,9 +73,14 @@ export default function Dashboard() {
             <h2 className="text-xl font-bold mb-2">Welcome! 👋</h2>
             <p className="text-gray-400 mb-4">Logged in as <span className="text-white">{userEmail}</span></p>
             <p className="text-gray-500 text-sm">Your account is being set up. Browse our tools while you wait!</p>
-            <Link href="/tools" className="inline-block mt-6 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-lg font-semibold transition">
-              Explore AI Tools →
-            </Link>
+            <div className="flex gap-4 justify-center mt-6">
+              <Link href="/tools" className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-lg font-semibold transition">
+                Explore AI Tools →
+              </Link>
+              <Link href="/pricing" className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-lg font-semibold transition">
+                View Plans
+              </Link>
+            </div>
           </div>
         </div>
       </main>
@@ -81,6 +95,11 @@ export default function Dashboard() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <div className="flex gap-3">
+            {isAdmin && (
+              <Link href="/admin" className="px-4 py-2 bg-red-600/80 rounded-lg text-sm hover:bg-red-500 transition">
+                Admin
+              </Link>
+            )}
             <Link href="/tools" className="px-4 py-2 bg-indigo-600 rounded-lg text-sm hover:bg-indigo-500 transition">
               Browse Tools
             </Link>
@@ -92,6 +111,13 @@ export default function Dashboard() {
             </button>
           </div>
         </div>
+
+        {/* Payment Success */}
+        {typeof window !== "undefined" && new URLSearchParams(window.location.search).get("payment") === "success" && (
+          <div className="mb-6 p-4 border border-green-500/30 bg-green-500/10 rounded-xl">
+            <p className="text-green-300">✅ Payment successful! Your account will be activated shortly.</p>
+          </div>
+        )}
 
         {/* Account Status */}
         {!profile.is_enabled && (
@@ -128,10 +154,10 @@ export default function Dashboard() {
 
         {/* Upgrade CTA */}
         {profile.subscription_tier === "free" && (
-          <div className="mb-8 border border-indigo-500/30 rounded-xl p-6 bg-indigo-500/10 flex items-center justify-between">
+          <div className="mb-8 border border-indigo-500/30 rounded-xl p-6 bg-indigo-500/10 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
-              <h2 className="text-lg font-bold mb-1">Upgrade your plan</h2>
-              <p className="text-gray-400 text-sm">Get more uses and access to all tools.</p>
+              <h2 className="text-lg font-bold mb-1">🚀 Upgrade your plan</h2>
+              <p className="text-gray-400 text-sm">Get more uses and access to all AI video tools.</p>
             </div>
             <Link href="/pricing" className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg font-semibold transition shrink-0">
               View Plans →

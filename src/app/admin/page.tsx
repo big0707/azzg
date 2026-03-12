@@ -12,26 +12,31 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [token, setToken] = useState("");
   const supabase = createBrowserClient();
   const router = useRouter();
 
   useEffect(() => {
     async function load() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push("/auth/login"); return; }
-      if (!ADMIN_EMAILS.includes(user.email || "")) {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { router.push("/auth/login"); return; }
+      if (!ADMIN_EMAILS.includes(session.user.email || "")) {
         router.push("/dashboard");
         return;
       }
       setIsAdmin(true);
-      await fetchUsers();
+      setToken(session.access_token);
+      await fetchUsers(session.access_token);
     }
     load();
   }, []);
 
-  async function fetchUsers() {
+  async function fetchUsers(accessToken?: string) {
     setLoading(true);
-    const res = await fetch("/api/admin/users");
+    const t = accessToken || token;
+    const res = await fetch("/api/admin/users", {
+      headers: { "Authorization": `Bearer ${t}` },
+    });
     if (res.ok) {
       const data = await res.json();
       setUsers(data.users || []);
@@ -43,7 +48,7 @@ export default function AdminPage() {
     setActionLoading(userId);
     const res = await fetch("/api/admin/users", {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({ userId, is_enabled: enable }),
     });
     if (res.ok) {
@@ -57,7 +62,7 @@ export default function AdminPage() {
     const limits: Record<string, number> = { free: 3, basic: 500, pro: 3000 };
     const res = await fetch("/api/admin/users", {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({ userId, subscription_tier: tier, usage_limit: limits[tier] || 3 }),
     });
     if (res.ok) {
@@ -81,7 +86,7 @@ export default function AdminPage() {
             <p className="text-gray-400 text-sm">{users.length} registered users</p>
           </div>
           <div className="flex gap-3">
-            <button onClick={fetchUsers} className="px-4 py-2 bg-white/10 rounded-lg text-sm hover:bg-white/20 transition">
+            <button onClick={() => fetchUsers()} className="px-4 py-2 bg-white/10 rounded-lg text-sm hover:bg-white/20 transition">
               ↻ Refresh
             </button>
             <Link href="/dashboard" className="px-4 py-2 text-sm text-gray-400 hover:text-white transition">← Dashboard</Link>
@@ -113,6 +118,10 @@ export default function AdminPage() {
           <div className="text-center py-12">
             <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="text-gray-400">Loading users...</p>
+          </div>
+        ) : users.length === 0 ? (
+          <div className="text-center py-12 border border-white/10 rounded-xl bg-white/5">
+            <p className="text-gray-400">No users found.</p>
           </div>
         ) : (
           <div className="border border-white/10 rounded-xl overflow-hidden">

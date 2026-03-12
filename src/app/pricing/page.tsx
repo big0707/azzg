@@ -36,6 +36,7 @@ const plans = [
 
 function PricingContent() {
   const [user, setUser] = useState<any>(null);
+  const [accessToken, setAccessToken] = useState("");
   const [loading, setLoading] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const supabase = createBrowserClient();
@@ -44,8 +45,11 @@ function PricingContent() {
 
   useEffect(() => {
     async function checkAuth() {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setUser(session.user);
+        setAccessToken(session.access_token);
+      }
     }
     checkAuth();
 
@@ -67,7 +71,7 @@ function PricingContent() {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tier }),
+        body: JSON.stringify({ tier, accessToken }),
       });
       const data = await res.json();
       if (data.url) {
