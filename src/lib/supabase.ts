@@ -16,12 +16,13 @@ export type UserProfile = {
   stripe_customer_id: string | null;
 };
 
+// Placeholder URL for build time when env vars are not available
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-key";
+
 // Client-side (browser)
 export function createBrowserClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
 // Server-side (API routes)
