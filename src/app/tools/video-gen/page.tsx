@@ -63,7 +63,8 @@ export default function VideoGenPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) { setError(data.error || "Failed to create task"); setTaskState("failed"); return; }
+      if (!res.ok || data.error) { setError(data.error || "Failed to create task"); setTaskState("failed"); return; }
+      if (!data.id) { setError("No task ID returned. Please try again."); setTaskState("failed"); return; }
 
       setPredictionId(data.id);
       setTaskState("processing");
@@ -83,7 +84,16 @@ export default function VideoGenPage() {
         });
         const data = await res.json();
 
-        if (data.logs) setLogs(data.logs);
+        setLogs(prev => {
+          const ts = new Date().toLocaleTimeString();
+          const line = `[${ts}] Status: ${data.status || data.error || 'polling...'}`;
+          return prev ? prev + '\n' + line : line;
+        });
+
+        if (data.error && !data.status) {
+          // API error but not a task failure
+          return;
+        }
 
         if (data.status === "succeeded") {
           setTaskState("completed");
@@ -94,7 +104,9 @@ export default function VideoGenPage() {
           setError(data.error || "Video generation failed.");
           if (pollRef.current) clearInterval(pollRef.current);
         }
-      } catch (err) { /* ignore polling errors */ }
+      } catch (err) { 
+        console.error("Polling error:", err);
+      }
     }, 5000);
   }
 
