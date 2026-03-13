@@ -1,3 +1,4 @@
 {
+  "installCommand": "npx pnpm install",
   "framework": "nextjs"
 }
