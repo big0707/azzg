@@ -146,6 +146,14 @@ Make the script compelling, platform-appropriate, and ready to produce. Include 
       }
 
       const content = data.choices?.[0]?.message?.content || "";
+      
+      // Debug: if no content, show what the API actually returned
+      if (!content) {
+        setError(`No content in API response. Details: ${JSON.stringify(data).slice(0, 200)}`);
+        setGenerating(false);
+        return;
+      }
+      
       setRawText(content);
 
       // Try to parse JSON from response with multiple strategies
@@ -178,8 +186,8 @@ Make the script compelling, platform-appropriate, and ready to produce. Include 
       } else if (content) {
         setError("AI returned non-standard format. Showing raw output.");
       }
-    } catch (err) {
-      setError("Network error. Please check your connection and try again.");
+    } catch (err: any) {
+      setError(`Request failed: ${err?.message || String(err)}`);
     }
 
     setGenerating(false);
