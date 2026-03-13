@@ -11,9 +11,11 @@ type Tool = {
   stars: string;
   github: string;
   status: "live" | "coming";
+  path?: string;
 };
 
 const allTools: Tool[] = [
+  { name: "AI Video Script Generator", desc: "Generate professional video scripts instantly. Supports Douyin, YouTube, Bilibili, Xiaohongshu and more. Multiple tones and languages.", category: "Video Creation", stars: "New", github: "", status: "live", path: "/tools/video-script" },
   { name: "MoneyPrinterTurbo", desc: "AI-powered short video generator. Create viral videos in minutes with automated script, voiceover, and editing.", category: "Video Creation", stars: "50K", github: "https://github.com/harry0703/MoneyPrinterTurbo", status: "coming" },
   { name: "VideoLingo", desc: "Translate and dub videos into any language with AI. Preserves original tone and lip-sync.", category: "Translation", stars: "16K", github: "https://github.com/Huanshere/VideoLingo", status: "coming" },
   { name: "pyVideoTrans", desc: "Full-featured video translator supporting subtitles, dubbing, and voice cloning across 100+ languages.", category: "Translation", stars: "16K", github: "https://github.com/jianchang512/pyvideotrans", status: "coming" },
@@ -92,10 +94,12 @@ export default function ToolsPage() {
               <p className="text-gray-400 text-sm mb-4 leading-relaxed">{tool.desc}</p>
               <div className="flex justify-between items-center">
                 <span className="text-xs px-2 py-1 bg-indigo-500/20 text-indigo-300 rounded">{tool.category}</span>
-                {tool.status === "live" ? (
-                  <button className="text-xs px-3 py-1 bg-green-600 hover:bg-green-500 text-white rounded transition">
+                {tool.status === "live" && tool.path ? (
+                  <Link href={tool.path} className="text-xs px-3 py-1 bg-green-600 hover:bg-green-500 text-white rounded transition inline-block">
                     Launch →
-                  </button>
+                  </Link>
+                ) : tool.status === "live" ? (
+                  <span className="text-xs px-3 py-1 bg-green-600 text-white rounded">Live</span>
                 ) : (
                   <span className="text-xs text-gray-500">Coming Soon</span>
                 )}
