@@ -106,6 +106,7 @@ export default function MoneyPrinterPage() {
           video_clip_duration: clipDuration,
           video_count: videoCount,
           video_concat_mode: "random",
+          video_transition_mode: "none",
           video_source: "pexels",
           n_threads: 2,
           paragraph_number: 1,
