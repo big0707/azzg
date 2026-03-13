@@ -116,9 +116,13 @@ Make the script compelling, platform-appropriate, and ready to produce. Include 
         },
         body: JSON.stringify({
           model: "google/gemini-2.0-flash-001",
-          messages: [{ role: "user", content: prompt }],
+          messages: [
+            { role: "system", content: "You are a JSON API. You MUST respond with ONLY a valid JSON object. No markdown, no explanation, no code fences. Start with { and end with }." },
+            { role: "user", content: prompt }
+          ],
           temperature: 0.8,
           max_tokens: 2000,
+          response_format: { type: "json_object" },
         }),
       });
 
@@ -133,23 +137,34 @@ Make the script compelling, platform-appropriate, and ready to produce. Include 
       const content = data.choices?.[0]?.message?.content || "";
       setRawText(content);
 
-      // Try to parse JSON from response
+      // Try to parse JSON from response with multiple strategies
+      let parsed = null;
       try {
-        // Strip markdown code blocks if present (handles ```json, ``` with newlines, etc.)
-        let jsonStr = content;
-        // Remove leading/trailing markdown fences
-        const fenceMatch = jsonStr.match(/```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/);
-        if (fenceMatch) {
-          jsonStr = fenceMatch[1];
-        } else {
-          jsonStr = jsonStr.replace(/^```(?:json)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+        // Strategy 1: Direct parse
+        parsed = JSON.parse(content.trim());
+      } catch {
+        try {
+          // Strategy 2: Strip markdown code fences
+          const fenceMatch = content.match(/```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/);
+          const stripped = fenceMatch ? fenceMatch[1] : content.replace(/^```(?:json)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+          parsed = JSON.parse(stripped.trim());
+        } catch {
+          try {
+            // Strategy 3: Find first { ... last } in the text
+            const firstBrace = content.indexOf("{");
+            const lastBrace = content.lastIndexOf("}");
+            if (firstBrace !== -1 && lastBrace > firstBrace) {
+              parsed = JSON.parse(content.slice(firstBrace, lastBrace + 1));
+            }
+          } catch {
+            // All strategies failed
+          }
         }
-        jsonStr = jsonStr.trim();
-        const parsed = JSON.parse(jsonStr);
+      }
+      if (parsed && parsed.title) {
         setResult(parsed);
         setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
-      } catch {
-        // If JSON parsing fails, show raw text
+      } else if (content) {
         setError("AI returned non-standard format. Showing raw output.");
       }
     } catch (err) {
