@@ -56,7 +56,16 @@ export default function MoneyPrinterPage() {
       setLoading(false);
     }
     checkAuth();
-    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+
+    // Listen for auth state changes (important for OAuth redirects)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s);
+      setUser(s?.user || null);
+    });
+    return () => {
+      subscription.unsubscribe();
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
   }, []);
 
   async function handleGenerate() {

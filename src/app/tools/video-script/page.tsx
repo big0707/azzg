@@ -61,11 +61,22 @@ export default function VideoScriptPage() {
       setLoading(false);
     }
     checkAuth();
+
+    // Listen for auth state changes (important for OAuth redirects)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s);
+      setUser(s?.user || null);
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
   async function handleGenerate() {
-    if (!topic.trim()) return;
+    if (!topic.trim()) {
+      setError("Please enter a video topic.");
+      return;
+    }
     if (!session) {
+      setError("Please sign in first to generate scripts.");
       router.push("/auth/login");
       return;
     }
