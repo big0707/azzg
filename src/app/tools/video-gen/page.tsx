@@ -57,8 +57,8 @@ export default function VideoGenPage() {
           "Authorization": `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
-          model: "minimax/video-01",
-          input: { prompt: prompt.trim() },
+          prompt: prompt.trim(),
+          model: "video-01",
         }),
       });
 
@@ -87,15 +87,7 @@ export default function VideoGenPage() {
 
         if (data.status === "succeeded") {
           setTaskState("completed");
-          // output can be a string URL or an array
-          const output = data.output;
-          if (typeof output === "string") {
-            setVideoUrl(output);
-          } else if (Array.isArray(output) && output.length > 0) {
-            setVideoUrl(output[0]);
-          } else {
-            setVideoUrl(String(output));
-          }
+          setVideoUrl(data.video_url || "");
           if (pollRef.current) clearInterval(pollRef.current);
         } else if (data.status === "failed" || data.status === "canceled") {
           setTaskState("failed");
