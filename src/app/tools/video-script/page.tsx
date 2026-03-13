@@ -135,8 +135,16 @@ Make the script compelling, platform-appropriate, and ready to produce. Include 
 
       // Try to parse JSON from response
       try {
-        // Strip markdown code blocks if present
-        const jsonStr = content.replace(/```json?\n?/g, "").replace(/```/g, "").trim();
+        // Strip markdown code blocks if present (handles ```json, ``` with newlines, etc.)
+        let jsonStr = content;
+        // Remove leading/trailing markdown fences
+        const fenceMatch = jsonStr.match(/```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/);
+        if (fenceMatch) {
+          jsonStr = fenceMatch[1];
+        } else {
+          jsonStr = jsonStr.replace(/^```(?:json)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+        }
+        jsonStr = jsonStr.trim();
         const parsed = JSON.parse(jsonStr);
         setResult(parsed);
         setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
