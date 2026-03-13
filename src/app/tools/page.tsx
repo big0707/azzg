@@ -16,7 +16,8 @@ type Tool = {
 
 const allTools: Tool[] = [
   { name: "AI Video Script Generator", desc: "Generate professional video scripts instantly. Supports Douyin, YouTube, Bilibili, Xiaohongshu and more. Multiple tones and languages.", category: "Video Creation", stars: "New", github: "", status: "live", path: "/tools/video-script" },
-  { name: "MoneyPrinterTurbo", desc: "AI-powered short video generator. Create viral videos in minutes with automated script, voiceover, and editing.", category: "Video Creation", stars: "50K", github: "https://github.com/harry0703/MoneyPrinterTurbo", status: "live", path: "/tools/money-printer" },
+  { name: "AI Video Generator", desc: "Generate stunning AI videos from text descriptions. Powered by Minimax Video-01. No local dependencies.", category: "Video Creation", stars: "New", github: "", status: "live", path: "/tools/video-gen" },
+  { name: "MoneyPrinterTurbo", desc: "AI-powered short video generator. Create viral videos in minutes with automated script, voiceover, and editing.", category: "Video Creation", stars: "50K", github: "https://github.com/harry0703/MoneyPrinterTurbo", status: "coming" },
   { name: "VideoLingo", desc: "Translate and dub videos into any language with AI. Preserves original tone and lip-sync.", category: "Translation", stars: "16K", github: "https://github.com/Huanshere/VideoLingo", status: "coming" },
   { name: "pyVideoTrans", desc: "Full-featured video translator supporting subtitles, dubbing, and voice cloning across 100+ languages.", category: "Translation", stars: "16K", github: "https://github.com/jianchang512/pyvideotrans", status: "coming" },
   { name: "NarratoAI", desc: "AI movie commentary and remix tool. Auto-generate engaging narration for film scenes.", category: "Video Creation", stars: "8K", github: "https://github.com/linyqh/NarratoAI", status: "coming" },
