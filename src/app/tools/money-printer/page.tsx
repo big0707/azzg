@@ -5,13 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const voiceOptions = [
-  { id: "zh-CN-XiaoxiaoNeural-Female", label: "晓晓 (女)", lang: "zh" },
-  { id: "zh-CN-YunxiNeural-Male", label: "云希 (男)", lang: "zh" },
-  { id: "zh-CN-YunjianNeural-Male", label: "云健 (男)", lang: "zh" },
-  { id: "zh-CN-XiaoyiNeural-Female", label: "晓伊 (女)", lang: "zh" },
-  { id: "en-US-JennyNeural-Female", label: "Jenny (F)", lang: "en" },
-  { id: "en-US-GuyNeural-Male", label: "Guy (M)", lang: "en" },
-  { id: "en-US-AriaNeural-Female", label: "Aria (F)", lang: "en" },
+  { id: "gemini:Kore-Female", label: "Kore (女)", lang: "all" },
+  { id: "gemini:Aoede-Female", label: "Aoede (女)", lang: "all" },
+  { id: "gemini:Zephyr-Female", label: "Zephyr (女)", lang: "all" },
+  { id: "gemini:Thalia-Female", label: "Thalia (女)", lang: "all" },
+  { id: "gemini:Puck-Male", label: "Puck (男)", lang: "all" },
+  { id: "gemini:Charon-Male", label: "Charon (男)", lang: "all" },
+  { id: "gemini:Fenrir-Male", label: "Fenrir (男)", lang: "all" },
+  { id: "gemini:Sage-Male", label: "Sage (男)", lang: "all" },
 ];
 
 const aspectOptions = [
@@ -30,7 +31,7 @@ export default function MoneyPrinterPage() {
   // Form state
   const [subject, setSubject] = useState("");
   const [aspect, setAspect] = useState("9:16");
-  const [voice, setVoice] = useState("zh-CN-XiaoxiaoNeural-Female");
+  const [voice, setVoice] = useState("gemini:Kore-Female");
   const [clipDuration, setClipDuration] = useState(5);
   const [videoCount, setVideoCount] = useState(1);
   const [subtitleEnabled, setSubtitleEnabled] = useState(true);
@@ -257,16 +258,9 @@ export default function MoneyPrinterPage() {
                   onChange={(e) => setVoice(e.target.value)}
                   className="w-full px-4 py-3 bg-white/10 border border-white/10 rounded-lg focus:border-indigo-500 outline-none"
                 >
-                  <optgroup label="中文">
-                    {voiceOptions.filter(v => v.lang === "zh").map(v => (
-                      <option key={v.id} value={v.id}>{v.label}</option>
-                    ))}
-                  </optgroup>
-                  <optgroup label="English">
-                    {voiceOptions.filter(v => v.lang === "en").map(v => (
-                      <option key={v.id} value={v.id}>{v.label}</option>
-                    ))}
-                  </optgroup>
+                  {voiceOptions.map(v => (
+                    <option key={v.id} value={v.id}>{v.label}</option>
+                  ))}
                 </select>
               </div>
               <div>
