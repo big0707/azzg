@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 
-const MPT_API_URL = process.env.TOOL_SERVER_URL || "http://43.155.158.149";
-const MPT_PORT = "8080";
+const MPT_BASE_URL = process.env.MPT_API_URL || "https://api.azzg.com/mpt";
 
 // Proxy to MoneyPrinterTurbo API with auth + usage checks
 export async function POST(req: NextRequest) {
@@ -36,7 +35,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { endpoint, ...params } = body;
 
-    const mptUrl = `${MPT_API_URL}:${MPT_PORT}/api/v1${endpoint}`;
+    const mptUrl = `${MPT_BASE_URL}/api/v1${endpoint}`;
     const response = await fetch(mptUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -77,7 +76,7 @@ export async function GET(req: NextRequest) {
 
     if (!taskId) return NextResponse.json({ error: "task_id required" }, { status: 400 });
 
-    const mptUrl = `${MPT_API_URL}:${MPT_PORT}/api/v1/tasks/${taskId}`;
+    const mptUrl = `${MPT_BASE_URL}/api/v1/tasks/${taskId}`;
     const response = await fetch(mptUrl);
     const data = await response.json();
 
