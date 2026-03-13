@@ -203,7 +203,7 @@ export default function MoneyPrinterPage() {
         </div>
 
         {/* Input Form */}
-        {(taskState === "idle" || taskState === "failed") && (
+        {(["idle", "failed"] as TaskState[]).includes(taskState) && (
           <div className="border border-white/10 rounded-xl p-6 bg-white/5 mb-8">
             {/* Subject */}
             <div className="mb-6">
@@ -342,7 +342,7 @@ export default function MoneyPrinterPage() {
         )}
 
         {/* Processing State */}
-        {(taskState === "processing" || taskState === "submitting") && taskState !== "idle" && taskId && (
+        {(["processing", "submitting"] as TaskState[]).includes(taskState) && taskId && (
           <div className="border border-white/10 rounded-xl p-8 bg-white/5 text-center">
             <div className="mb-6">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-600/20 mb-4">
